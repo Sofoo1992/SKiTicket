@@ -1,12 +1,8 @@
 # IDE
 .idea/
 
-# Python virtual environment binaries
-.venv/bin/
-.venv/lib/
-.venv/pyvenv.cfg
-.venv/CACHEDIR.TAG
-.venv/.gitignore
+# Python virtual environment
+.venv/
 
 # macOS
 .DS_Store
