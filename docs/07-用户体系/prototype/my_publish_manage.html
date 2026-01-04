@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>我的发布管理</title>
+    <style>
+        :root {
+            --primary-color: #1890ff;
+            --text-main: #333;
+            --text-sub: #999;
+            --bg-page: #f7f8fa;
+            --white: #fff;
+            --danger: #ff4d4f;
+            --success: #52c41a;
+            --warning: #faad14;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-page);
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+            color: var(--text-main);
+            padding-bottom: 40px;
+        }
+
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            background: var(--white);
+            z-index: 100;
+            border-bottom: 1px solid #eee;
+        }
+
+        .nav-bar {
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 16px;
+            font-size: 20px;
+            color: #333;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            height: 44px;
+            background: var(--white);
+        }
+
+        .tab-item {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            color: var(--text-sub);
+            position: relative;
+        }
+
+        .tab-item.active {
+            color: #333;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .tab-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            width: 20px;
+            height: 3px;
+            background-color: #333;
+            border-radius: 2px;
+        }
+
+        /* Content Area */
+        .tab-content {
+            display: none;
+            padding: 12px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* === 1. Dynamics List (Masonry-like) === */
+        /* Replicating the user's screenshot style */
+        .dynamic-list {
+            display: flex;
+            gap: 10px;
+        }
+
+        .dynamic-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .dynamic-card {
+            background: var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+            position: relative;
+        }
+
+        .dynamic-img {
+            width: 100%;
+            height: auto;
+            display: block;
+            background: #eee;
+        }
+
+        .view-badge {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .dynamic-info {
+            padding: 10px;
+        }
+
+        .dynamic-title {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .dynamic-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 12px;
+        }
+
+        .manage-btn {
+            width: 100%;
+            padding: 6px 0;
+            background: #f5f7fa;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            color: #666;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        /* === 2. Idle Items List (New Request) === */
+        /* Designed for product management status */
+        .idle-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            gap: 12px;
+            position: relative;
+        }
+
+        /* Status Overlays */
+        .idle-card.status-sold {
+            opacity: 0.8;
+            filter: grayscale(100%);
+        }
+
+        .idle-card.status-off {
+            opacity: 0.7;
+            background: #f9f9f9;
+        }
+
+        .idle-img-box {
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            background: #eee;
+            overflow: hidden;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .idle-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .status-tag {
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 2px 6px;
+            font-size: 10px;
+            color: white;
+            border-bottom-right-radius: 8px;
+        }
+
+        .tag-selling {
+            background: var(--primary-color);
+        }
+
+        .tag-sold {
+            background: #999;
+        }
+
+        .tag-off {
+            background: var(--danger);
+        }
+
+        .idle-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .idle-title {
+            font-size: 15px;
+            font-weight: 500;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .idle-price {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ff4d4f;
+            margin-top: 4px;
+        }
+
+        .idle-stats {
+            font-size: 11px;
+            color: #999;
+            display: flex;
+            gap: 12px;
+            margin-top: 4px;
+        }
+
+        .idle-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 8px;
+        }
+
+        .btn-more {
+            padding: 4px 12px;
+            background: #f5f7fa;
+            border-radius: 12px;
+            color: #333;
+            font-size: 20px;
+            /* ... icon */
+            line-height: 10px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Filter Row for Idle */
+        .filter-row {
+            display: flex;
+            gap: 16px;
+            padding-bottom: 12px;
+            overflow-x: auto;
+        }
+
+        .filter-chip {
+            padding: 4px 12px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 14px;
+            font-size: 12px;
+            color: #666;
+            white-space: nowrap;
+        }
+
+        .filter-chip.active {
+            background: #e6f7ff;
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+
+
+        /* Bottom Action Sheet */
+        .mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 900;
+            display: none;
+        }
+
+        .action-sheet {
+            position: fixed;
+            bottom: -100%;
+            /* Hidden */
+            left: 0;
+            width: 100%;
+            background: #f7f8fa;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            z-index: 1000;
+            transition: bottom 0.3s ease;
+            padding-bottom: constant(safe-area-inset-bottom);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .action-sheet.show {
+            bottom: 0;
+        }
+
+        .sheet-header {
+            text-align: center;
+            padding: 12px;
+            font-size: 12px;
+            color: #999;
+            background: #fff;
+            border-bottom: 1px solid #eee;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+        }
+
+        .sheet-item {
+            background: #fff;
+            padding: 16px;
+            text-align: center;
+            font-size: 16px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .sheet-item:active {
+            background: #f2f2f2;
+        }
+
+        .text-danger {
+            color: #ff4d4f;
+        }
+
+        .text-blue {
+            color: #1890ff;
+        }
+
+        .sheet-cancel {
+            margin-top: 8px;
+            border-bottom: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <div class="nav-bar">
+            <span class="back-btn">‹</span>
+            <span>内容管理</span>
+        </div>
+        <div class="tabs">
+            <div class="tab-item" onclick="switchTab('dynamic')">我的动态 (2)</div>
+            <div class="tab-item active" onclick="switchTab('idle')">我的闲置 (4)</div>
+        </div>
+    </div>
+
+    <!-- 1. 我的动态 Tab -->
+    <div id="tab-dynamic" class="tab-content" style="display: none;">
+        <div class="dynamic-list">
+            <!-- Left Column -->
+            <div class="dynamic-col">
+                <div class="dynamic-card">
+                    <div style="position:relative;">
+                        <img src="https://picsum.photos/200/300?1" class="dynamic-img">
+                        <div class="view-badge">👁️ 29</div>
+                    </div>
+                    <div class="dynamic-info">
+                        <div class="dynamic-title">mark</div>
+                        <div class="dynamic-meta">
+                            <span>2025.12.31</span>
+                            <span>🔥 5</span>
+                        </div>
+                        <div class="manage-btn" onclick="openSheet('dynamic')">管理</div>
+                    </div>
+                </div>
+            </div>
+            <!-- Right Column -->
+            <div class="dynamic-col">
+                <div class="dynamic-card">
+                    <div style="position:relative;">
+                        <img src="https://picsum.photos/200/250?2" class="dynamic-img">
+                        <div class="view-badge">👁️ 99</div>
+                    </div>
+                    <div class="dynamic-info">
+                        <div class="dynamic-title">Test</div>
+                        <div class="dynamic-meta">
+                            <span>2025.11.30</span>
+                            <span>🔥 7</span>
+                        </div>
+                        <div class="manage-btn" onclick="openSheet('dynamic')">管理</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 我的闲置 Tab -->
+    <div id="tab-idle" class="tab-content active">
+        <!-- Filters -->
+        <div class="filter-row">
+            <div class="filter-chip active">全部</div>
+            <div class="filter-chip">在售 (2)</div>
+            <div class="filter-chip">已出 (1)</div>
+            <div class="filter-chip">已下架 (1)</div>
+        </div>
+
+        <!-- Item 1: Selling -->
+        <div class="idle-card">
+            <div class="idle-img-box">
+                <div class="status-tag tag-selling">在售</div>
+                <img src="https://picsum.photos/200/200?3" class="idle-img">
+            </div>
+            <div class="idle-content">
+                <div>
+                    <div class="idle-title">95新 Burton 滑雪板，23年新款，只滑过一次</div>
+                    <div class="idle-price">¥ 1,200</div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div class="idle-stats">曝光 102 · 想要 5</div>
+                    <div class="manage-btn" style="width: 60px;" onclick="openSheet('selling')">管理</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Item 2: Selling -->
+        <div class="idle-card">
+            <div class="idle-img-box">
+                <div class="status-tag tag-selling">在售</div>
+                <img src="https://picsum.photos/200/200?4" class="idle-img">
+            </div>
+            <div class="idle-content">
+                <div>
+                    <div class="idle-title">Oakley 雪镜，带替换镜片</div>
+                    <div class="idle-price">¥ 800</div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div class="idle-stats">曝光 45 · 想要 1</div>
+                    <div class="manage-btn" style="width: 60px;" onclick="openSheet('selling')">管理</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Item 3: Sold Out -->
+        <div class="idle-card status-sold">
+            <div class="idle-img-box">
+                <div class="status-tag tag-sold">已出</div>
+                <img src="https://picsum.photos/200/200?5" class="idle-img">
+            </div>
+            <div class="idle-content">
+                <div>
+                    <div class="idle-title">北面滑雪服外套 L码</div>
+                    <div class="idle-price">¥ 1,500</div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div class="idle-stats">成交时间: 12-20</div>
+                    <div class="manage-btn" style="width: 60px;" onclick="openSheet('sold')">管理</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Item 4: Off Shelf -->
+        <div class="idle-card status-off">
+            <div class="idle-img-box">
+                <div class="status-tag tag-off">下架</div>
+                <img src="https://picsum.photos/200/200?6" class="idle-img">
+            </div>
+            <div class="idle-content">
+                <div>
+                    <div class="idle-title">旧雪手套（自用）</div>
+                    <div class="idle-price">¥ 50</div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div class="idle-stats">违规/手动下架</div>
+                    <div class="manage-btn" style="width: 60px;" onclick="openSheet('off')">管理</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Actions Sheet (Dynamics) -->
+    <div id="sheet-dynamic" class="action-sheet">
+        <div class="sheet-item">修改</div>
+        <div class="sheet-item text-danger">删除</div>
+        <div class="sheet-item sheet-cancel" onclick="closeSheets()">取消</div>
+    </div>
+
+    <!-- Actions Sheet (Idle: Selling) -->
+    <div id="sheet-selling" class="action-sheet">
+        <div class="sheet-header">正在出售中</div>
+        <div class="sheet-item text-blue">标记已出</div>
+        <div class="sheet-item">编辑商品</div>
+        <div class="sheet-item">下架商品</div>
+        <div class="sheet-item text-danger">删除</div>
+        <div class="sheet-item sheet-cancel" onclick="closeSheets()">取消</div>
+    </div>
+
+    <!-- Actions Sheet (Idle: Sold) -->
+    <div id="sheet-sold" class="action-sheet">
+        <div class="sheet-header">交易已完成</div>
+        <div class="sheet-item text-danger">删除记录</div>
+        <div class="sheet-item sheet-cancel" onclick="closeSheets()">取消</div>
+    </div>
+
+    <!-- Actions Sheet (Idle: Off) -->
+    <div id="sheet-off" class="action-sheet">
+        <div class="sheet-header">商品已下架</div>
+        <div class="sheet-item text-blue">重新上架</div>
+        <div class="sheet-item">编辑商品</div>
+        <div class="sheet-item text-danger">删除</div>
+        <div class="sheet-item sheet-cancel" onclick="closeSheets()">取消</div>
+    </div>
+
+    <div id="sheet-mask" class="mask" onclick="closeSheets()"></div>
+
+    <script>
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+
+            if (tab === 'dynamic') {
+                document.querySelectorAll('.tab-item')[0].classList.add('active');
+                document.getElementById('tab-dynamic').style.display = 'block';
+            } else {
+                document.querySelectorAll('.tab-item')[1].classList.add('active');
+                document.getElementById('tab-idle').style.display = 'block';
+            }
+        }
+
+        function openSheet(type) {
+            document.getElementById('sheet-mask').style.display = 'block';
+            document.getElementById('sheet-' + type).classList.add('show');
+        }
+
+        function closeSheets() {
+            document.getElementById('sheet-mask').style.display = 'none';
+            document.querySelectorAll('.action-sheet').forEach(el => el.classList.remove('show'));
+        }
+    </script>
+</body>
+
+</html>
