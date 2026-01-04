@@ -1,168 +1,73 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+AI 助手在本仓库工作时的上下文指南。
 
-## Project Overview
+## 项目概览
 
-This is a **product prototype documentation repository** for a ski resort ticketing operations backend system. This is NOT a code repository - it contains only Markdown documentation files describing the product design.
+**雪哒 APP** 是户外滑雪社交平台，包含以下核心模块：
 
-**Purpose**: Design and document the雪哒APP (Xueda APP) ski resort ticketing platform that:
-- Aggregates 200+ ski resort ticketing systems through自我游(Ziwoyou) API
-- Manages ski tickets, ski+hotel packages, and coaching courses
-- Serves both C-end users (雪哒APP) and B-end distributors
+| 模块 | 状态 | 核心概念 |
+|------|------|---------|
+| 首页与发现 | 🚧 | 雪场列表、搜索、推荐 |
+| 动态与社交 | 🚧 | Feed 流、发帖、关注体系 |
+| 轨迹与地图 | 🚧 | GPS 采集、3D 地图、POI |
+| **票务分销** | ✅ | 模板体系、日历库存、订单拆分 |
+| 闲置交易 | 🚧 | 二手装备、担保交易 |
+| 活动 | 🚧 | 赛事、约伴、滑雪营 |
+| 用户体系 | 🚧 | 用户等级、会员权益 |
 
-## Architecture
+---
 
-### Core System Flow
+## 已完成模块：票务分销
+
+### 核心架构
+
 ```
-自我游票务系统 (3rd party supplier)
-    ↓ Daily sync
-票务库 (Ticket inventory with calendar-based stock)
-    ↓ Apply templates
-产品库 (Product catalog)
-    ↓ Publish
-雪哒APP (C-end) + 分销商 (B-end distributors)
-    ↓ Purchase
-订单管理 (Order management with sub-order splitting)
-```
-
-### Four-Template System
-1. **雪场模板** (Ski Resort Template): Resort info, facilities, transportation
-2. **酒店模板** (Hotel Template): Hotel info, room types, check-in/out times
-3. **分类模板** (Category Template): Product structure and default content for ticket types
-4. **商家模板** (Merchant Template): Global雪哒APP information
-
-## Critical Design Principles
-
-### 1. Extreme Simplicity
-- **Product names**: Directly use ticket inventory names (no complex generation/parsing)
-- **Template configuration**: Only 5-8 essential fields per template
-- **No complex logic**: No variable systems, no auto-extraction from ticket names
-
-### 2. Template Reusability
-- Templates configured once, applied to multiple products
-- Template updates automatically sync to associated products
-- Products can "detach" from templates for full customization
-
-### 3. Calendar-Based Inventory (NOT product-level)
-- Inventory stored at ticket level per date (daily calendar)
-- Products reference ticket inventory in real-time
-- Synced from自我游every 10 minutes
-
-### 4. Order Splitting for Consecutive Purchases
-- User buys 5 consecutive days → 1 main order + 5 sub-orders
-- Each day has independent verification code
-- Supports partial refunds (unused days only)
-
-## Key Technical Concepts
-
-### Inventory Management
-```sql
--- Inventory is stored per ticket SKU per date
-ticket_inventory (
-    ticket_sku,
-    date,           -- Each date has separate inventory
-    total_stock,
-    sold_count,
-    available       -- Calculated: total - sold
-)
-
--- Products do NOT store inventory
--- They reference ticket_inventory in real-time
+自我游票务系统 (第三方供应商)
+    ↓ 每日同步
+票务库 (日历库存)
+    ↓ 应用模板
+产品库
+    ↓ 发布
+雪哒APP (C端) + 分销商 (B端)
+    ↓ 购买
+订单管理 (拆单、核销)
 ```
 
-### Order Structure
-```
-Main Order #2025010700001 (¥1,600 for 5 days)
-├─ Sub-order 1: 2025-01-15, ¥320, verify_code: 8756 4321
-├─ Sub-order 2: 2025-01-16, ¥320, verify_code: 8756 4322
-├─ Sub-order 3: 2025-01-17, ¥320, verify_code: 8756 4323
-├─ Sub-order 4: 2025-01-18, ¥320, verify_code: 8756 4324
-└─ Sub-order 5: 2025-01-19, ¥320, verify_code: 8756 4325
-```
+### 四模板体系
 
-## Documentation Files
+1. **雪场模板**: 雪场介绍、设施、交通
+2. **酒店模板**: 酒店信息、房型、入离时间
+3. **分类模板**: 产品结构、默认内容
+4. **商家模板**: 雪哒 APP 全局信息
 
-### Essential Reading Order (for understanding the system)
-1. `README.md` - Start here for document index
-2. `库存与拆单逻辑.md` - Core inventory and order splitting logic
-3. `模板中心-精简版.md` - Template system architecture
-4. `产品完整流程-极简版.md` - Complete product lifecycle
-5. `产品详情页设计.md` - C-end UI structure
+### 关键设计原则
 
-### File Purposes
-- `雪场票务运营后台低保真原型_1.md`: Original comprehensive design (85KB)
-- `模板中心-精简版.md`: Simplified template center design
-- `产品完整流程-极简版.md`: Product creation, maintenance, C-end display
-- `库存与拆单逻辑.md`: Calendar inventory + order splitting + database schema
-- `产品详情页设计.md`: C-end product detail page for 3 product types
+- **日历库存**: 库存按票务+日期存储，产品实时引用
+- **连续购买拆单**: 5 天 → 1 主订单 + 5 子订单
+- **极简操作**: 单个产品 2 分钟创建，批量 3 分钟 10 个
 
-## Product Types
+### 票务文档
 
-1. **单次雪票** (Single Ski Ticket)
-   - Templates: Ski Resort + Category + Merchant
+- `docs/04-票务分销/运营后台设计.md` — 后台全貌
+- `docs/04-票务分销/模板中心.md` — 模板配置
+- `docs/04-票务分销/库存与订单.md` — 库存拆单逻辑
+- `docs/04-票务分销/产品详情页.md` — C 端详情页
 
-2. **住滑套餐** (Ski+Hotel Package)
-   - Templates: Ski Resort + Hotel + Category + Merchant
-   - Inventory = min(hotel_inventory, ticket_inventory)
+---
 
-3. **教练培训** (Coaching Course)
-   - Templates: Ski Resort + Category + Merchant
+## 编辑规范
 
-## Important Business Rules
+- 使用**中文**撰写内容
+- 遵循**极简原则**：避免复杂配置、变量系统
+- 文档更新后同步更新根目录 README 的状态标记
 
-### Product Creation (2 minutes per product)
-```
-Step 1: Select ticket from票务库
-Step 2: Select templates (auto-matched by resort/hotel)
-Step 3: Product name = ticket name (can be edited later)
-Step 4: Set price, channels
-Step 5: Publish
-```
+---
 
-### Batch Creation (3 minutes for 10 products)
-- Select multiple tickets
-- Apply same template
-- Unified pricing rule (e.g., cost + ¥40)
-- Batch publish
+## 待补充模块
 
-### C-end Display Rules
-- **Must show**: Ski resort info (facilities, transportation) for decision-making
-- **Must show**: Hotel info for ski+hotel packages
-- **Never show**: Supplier (自我游) - only show雪哒APP
-- **Never show**: Internal ticket SKU
-
-### Inventory Check Flow
-1. Frontend: Real-time AJAX query when user selects date
-2. Backend: Double-check on order creation
-3. Payment: Lock inventory after successful payment
-4. Sync: Release inventory on refund/cancellation
-
-## Working with This Repository
-
-### Editing Documentation
-- All files are Markdown (.md)
-- Use Chinese for content (this is a Chinese product)
-- Follow the极简原则(extreme simplicity principle)
-- When adding new features, update relevant docs:
-  - Business flow → `产品完整流程-极简版.md`
-  - Inventory/orders → `库存与拆单逻辑.md`
-  - Templates → `模板中心-精简版.md`
-  - C-end UI → `产品详情页设计.md`
-
-### Design Philosophy
-- **Avoid complexity**: If it requires parsing, auto-generation, or complex mapping → it's too complex
-- **Operator control**: Give operations team full control, don't over-automate
-- **Template inheritance**: Use templates for consistency, allow detachment for flexibility
-- **Calendar-first**: Always think "inventory per date" not "total inventory"
-
-### Common Misconceptions to Avoid
-1. ❌ Product has its own inventory → ✅ Product references ticket's calendar inventory
-2. ❌ Auto-generate product titles with variables → ✅ Use ticket name directly, edit manually
-3. ❌ One order for 5 consecutive days → ✅ 1 main order + 5 sub-orders
-4. ❌ Show supplier to users → ✅ Only show雪哒APP merchant info
-
-## Version History
-- Initial design: 2025-01-07
-- Simplified optimization: 2025-01-08
-- Inventory/splitting refinement: 2025-01-08
+编写新模块文档时，参考票务分销的详细程度，需包含：
+- 业务流程图
+- 核心数据结构
+- 用户操作流程
+- 异常处理逻辑

@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>雪哒 APP - 首页</title>
+    <style>
+        :root {
+            --primary-color: #1890ff;
+            --text-main: #333;
+            --text-sub: #999;
+            --bg-page: #f5f7fa;
+            --white: #fff;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-page);
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+            color: var(--text-main);
+            padding-bottom: 80px;
+            /* Bottom tab bar space */
+        }
+
+        /* Top Navigation */
+        .top-nav {
+            position: sticky;
+            top: 0;
+            background: var(--white);
+            z-index: 100;
+            padding: 44px 16px 12px 16px;
+            /* Status bar spacing simulation */
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .nav-item {
+            font-size: 16px;
+            color: var(--text-sub);
+            font-weight: 500;
+            position: relative;
+        }
+
+        .nav-item.active {
+            font-size: 18px;
+            color: #000;
+            font-weight: 600;
+        }
+
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 16px;
+            height: 3px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .status-bar-sim {
+            position: absolute;
+            top: 14px;
+            width: 100%;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            color: #000;
+        }
+
+        /* King Kong Area */
+        .king-kong-area {
+            display: flex;
+            justify-content: space-between;
+            background: var(--white);
+            padding: 16px 20px;
+        }
+
+        .kong-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .kong-icon {
+            width: 44px;
+            height: 44px;
+            background: #e6f7ff;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #1890ff;
+        }
+
+        .kong-text {
+            font-size: 12px;
+            color: #333;
+        }
+
+        /* Banner Grid (1 Left + 2 Right) */
+        .banner-grid {
+            margin: 12px 16px;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            /* Left wider */
+            grid-template-rows: 1fr 1fr;
+            gap: 8px;
+            height: 180px;
+        }
+
+        .banner-item {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #ddd;
+        }
+
+        /* Main Banner: Left column, spans 2 rows */
+        .banner-main {
+            grid-column: 1 / 2;
+            grid-row: 1 / 3;
+            background: linear-gradient(135deg, #36cfc9 0%, #1890ff 100%);
+        }
+
+        /* Sub 1: Top Right */
+        .banner-sub1 {
+            grid-column: 2 / 3;
+            grid-row: 1 / 2;
+            background: #fff;
+        }
+
+        /* Sub 2: Bottom Right */
+        .banner-sub2 {
+            grid-column: 2 / 3;
+            grid-row: 2 / 3;
+            background: #fff;
+        }
+
+        .banner-content {
+            position: absolute;
+            padding: 12px;
+            height: 100%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            /* Text at bottom for Main */
+        }
+
+        .banner-main .banner-content {
+            color: white;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent);
+        }
+
+        .banner-sub .banner-content {
+            color: #333;
+            justify-content: center;
+            /* Centered text for Subs */
+            align-items: flex-start;
+        }
+
+        .banner-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .banner-subtitle {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .banner-sub-layout {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .banner-sub-text {
+            flex: 1;
+        }
+
+        .banner-sub-img {
+            width: 40px;
+            height: 40px;
+            background: #eee;
+            border-radius: 50%;
+        }
+
+        /* Hot Tickets (Horizontal Scroll) */
+        .section-header {
+            padding: 16px 16px 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--white);
+            margin-top: 12px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .section-title::before {
+            content: '🔥';
+            font-size: 18px;
+        }
+
+        .section-more {
+            font-size: 12px;
+            color: var(--text-sub);
+        }
+
+        .hot-scroll-container {
+            display: flex;
+            overflow-x: auto;
+            padding: 0 16px 16px 16px;
+            gap: 12px;
+            background: var(--white);
+            /* Hide scrollbar */
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .hot-scroll-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hot-card {
+            min-width: 140px;
+            width: 140px;
+        }
+
+        .hot-img-box {
+            width: 100%;
+            height: 100px;
+            border-radius: 8px;
+            background: #ddd;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hot-tag {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            font-size: 10px;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+
+        .hot-info {
+            padding-top: 8px;
+        }
+
+        .hot-name {
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .hot-price {
+            color: #1890ff;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+
+        .hot-price span {
+            font-size: 11px;
+            font-weight: normal;
+        }
+
+        /* Discovery Filter */
+        .filter-chips {
+            display: flex;
+            overflow-x: auto;
+            gap: 12px;
+            padding: 16px;
+            background: var(--bg-page);
+            position: sticky;
+            top: 90px;
+            /* Below nav */
+            z-index: 90;
+        }
+
+        .chip {
+            padding: 6px 16px;
+            border-radius: 20px;
+            background: #fff;
+            color: #666;
+            font-size: 14px;
+            white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .chip.active {
+            background: #e6f7ff;
+            color: #1890ff;
+            font-weight: 500;
+        }
+
+        /* Feed Flow (Masonry-ish flex) */
+        .feed-container {
+            padding: 0 8px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .feed-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .feed-card {
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            padding-bottom: 8px;
+        }
+
+        .feed-img {
+            width: 100%;
+            background: #eee;
+            display: block;
+        }
+
+        .feed-title {
+            font-size: 14px;
+            padding: 8px 8px 4px 8px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .feed-user {
+            padding: 0 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #999;
+        }
+
+        .feed-avatar {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #ddd;
+        }
+
+        .btn-edit {
+            position: fixed;
+            top: 40px;
+            right: 16px;
+            z-index: 101;
+            background: #1890ff;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            width: 80px;
+            text-decoration: none;
+            font-size: 12px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(24, 144, 255, 0.3);
+        }
+
+        /* Bottom Tab Bar */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 60px;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            color: #999;
+        }
+
+        .tab-item.active {
+            color: #1890ff;
+        }
+
+        .tab-icon {
+            font-size: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Link back to Config Admin for Demo purpose -->
+    <a href="admin_config.html" class="btn-edit">去后台配置</a>
+
+    <div class="status-bar-sim">
+        <span>9:41</span>
+        <span>📶 🔋</span>
+    </div>
+
+    <!-- Top Nav -->
+    <div class="top-nav">
+        <div class="nav-item active">发现</div>
+        <div class="nav-item">雪场</div>
+        <div class="nav-item">俱乐部</div>
+    </div>
+
+    <!-- King Kong Area (Configured by Backend) -->
+    <div class="king-kong-area">
+        <div class="kong-item">
+            <div class="kong-icon">🎫</div>
+            <span class="kong-text">购雪票</span>
+        </div>
+        <div class="kong-item">
+            <div class="kong-icon">💰</div>
+            <span class="kong-text">赚雪币</span>
+        </div>
+        <div class="kong-item">
+            <div class="kong-icon">📸</div>
+            <span class="kong-text">买照片</span>
+        </div>
+        <div class="kong-item">
+            <div class="kong-icon">🎿</div>
+            <span class="kong-text">约教练</span>
+        </div>
+        <div class="kong-item">
+            <div class="kong-icon">📺</div>
+            <span class="kong-text">雪场直播</span>
+        </div>
+    </div>
+
+    <!-- Banner Grid (Configured by Backend) -->
+    <!-- 对应后台配置：主Banner(左), 副Banner1(右上), 副Banner2(右下) -->
+    <div class="banner-grid">
+        <!-- Main Banner -->
+        <div class="banner-item banner-main">
+            <img src="" style="width:100%; height:100%; object-fit:cover; display:none;">
+            <div class="banner-content">
+                <div class="banner-title">主标题主标题主标题</div>
+                <div class="banner-subtitle">副标题副标题</div>
+            </div>
+            <!-- Pagination Dots -->
+            <div style="position:absolute; bottom:8px; right:8px; display:flex; gap:4px;">
+                <div style="width:12px; height:3px; background:rgba(255,255,255,0.9); border-radius:2px;"></div>
+                <div style="width:4px; height:3px; background:rgba(255,255,255,0.5); border-radius:2px;"></div>
+                <div style="width:4px; height:3px; background:rgba(255,255,255,0.5); border-radius:2px;"></div>
+            </div>
+        </div>
+        <!-- Sub Banner 1 -->
+        <div class="banner-item banner-sub1 banner-sub">
+            <div class="banner-sub-layout">
+                <div class="banner-sub-text">
+                    <div class="banner-title" style="font-size:14px;">万龙聊天室</div>
+                    <!-- 映射说明：这里展示的是后台配置的“副标题” -->
+                    <div class="banner-subtitle">点击查看 ></div>
+                </div>
+                <div class="banner-sub-img">🐶</div>
+            </div>
+        </div>
+        <!-- Sub Banner 2 -->
+        <div class="banner-item banner-sub2 banner-sub">
+            <div class="banner-sub-layout">
+                <div class="banner-sub-text">
+                    <div class="banner-title" style="font-size:14px;">雪币排行榜</div>
+                    <div class="banner-subtitle">点击查看 ></div>
+                </div>
+                <div class="banner-sub-img">🏆</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hot Tickets (Configured by Backend) -->
+    <div class="section-header">
+        <div class="section-title">热门雪票</div>
+        <div class="section-more">全部 ></div>
+    </div>
+    <div class="hot-scroll-container">
+        <!-- Item 1 -->
+        <div class="hot-card">
+            <div class="hot-img-box">
+                <!-- 映射说明：这里展示的是后台配置的“运营标签” -->
+                <div class="hot-tag">日场4小时</div>
+                <img src="" style="width:100%; height:100%; object-fit:cover; display:none;">
+            </div>
+            <div class="hot-info">
+                <div class="hot-name">万龙滑雪场</div>
+                <!-- 映射说明：推荐理由在首页卡片空间有限，暂不展示，可用于搜索或列表页 -->
+                <div class="hot-price">¥199.99<span>起</span></div>
+            </div>
+        </div>
+        <!-- Item 2 -->
+        <div class="hot-card">
+            <div class="hot-img-box">
+                <div class="hot-tag">日场4小时+雪具</div>
+                <img src="" style="width:100%; height:100%; object-fit:cover; display:none;">
+            </div>
+            <div class="hot-info">
+                <div class="hot-name">富龙滑雪场</div>
+                <div class="hot-price">¥199.99<span>起</span></div>
+            </div>
+        </div>
+        <!-- Item 3 -->
+        <div class="hot-card">
+            <div class="hot-img-box">
+                <div class="hot-tag">日场4小时</div>
+                <img src="" style="width:100%; height:100%; object-fit:cover; display:none;">
+            </div>
+            <div class="hot-info">
+                <div class="hot-name">将军山滑雪场</div>
+                <div class="hot-price">¥199.99<span>起</span></div>
+            </div>
+        </div>
+        <!-- Item 4 -->
+        <div class="hot-card">
+            <div class="hot-img-box">
+                <div class="hot-tag">日场4小时</div>
+            </div>
+            <div class="hot-info">
+                <div class="hot-name">万龙滑雪场</div>
+                <div class="hot-price">¥199.99<span>起</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Discovery Filter Chips -->
+    <div class="filter-chips">
+        <div class="chip active">💎 推荐</div>
+        <div class="chip">💃 约搭子</div>
+        <div class="chip">🏘️ 拼房</div>
+        <div class="chip">⛸️ 拼教练</div>
+        <div class="chip">🚗 拼车</div>
+    </div>
+
+    <!-- Feed Waterfall -->
+    <div class="feed-container">
+        <!-- Column 1 -->
+        <div class="feed-col">
+            <div class="feed-card">
+                <div class="feed-img"
+                    style="height: 180px; background: url('https://picsum.photos/300/400?1') center/cover;"></div>
+                <div class="feed-title">一二三四五六七八九十一二三四五六七八九...</div>
+                <div class="feed-user">
+                    <div class="feed-avatar"></div>
+                    <span>我是用户名</span>
+                </div>
+            </div>
+            <div class="feed-card">
+                <div class="feed-img"
+                    style="height: 120px; background: url('https://picsum.photos/300/200?2') center/cover;"></div>
+                <div class="feed-title">一二三四五六七八九十一二三四</div>
+                <div class="feed-user">
+                    <div class="feed-avatar"></div>
+                    <span>我是用户名</span>
+                </div>
+            </div>
+        </div>
+        <!-- Column 2 -->
+        <div class="feed-col">
+            <div class="feed-card">
+                <div class="feed-img"
+                    style="height: 140px; background: url('https://picsum.photos/300/300?3') center/cover;"></div>
+                <div class="feed-title">一二三四五六七八九十一二三四五六七八九...</div>
+                <div class="feed-price" style="padding:0 8px; color:#1890ff; font-weight:bold;">¥15.9</div>
+                <div class="feed-user">
+                    <div class="feed-avatar"></div>
+                    <span>我是用户名</span>
+                </div>
+            </div>
+            <div class="feed-card">
+                <div class="feed-img"
+                    style="height: 160px; background: url('https://picsum.photos/300/350?4') center/cover;"></div>
+                <div class="feed-title">一二三四五六七八九十一二三四五</div>
+                <div class="feed-price" style="padding:0 8px; color:#1890ff; font-weight:bold;">¥15.9</div>
+                <div class="feed-user">
+                    <div class="feed-avatar"></div>
+                    <span>我是用户名</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Tab Bar -->
+    <div class="tab-bar">
+        <div class="tab-item active">
+            <div class="tab-icon">🏠</div>
+            <span>首页</span>
+        </div>
+        <div class="tab-item">
+            <div class="tab-icon">🛍️</div>
+            <span>交易</span>
+        </div>
+        <div class="tab-item">
+            <div class="tab-icon">✈️</div>
+            <span>行程</span>
+        </div>
+        <div class="tab-item">
+            <div class="tab-icon">💬</div>
+            <span>留言</span>
+        </div>
+        <div class="tab-item">
+            <div class="tab-icon">😊</div>
+            <span>我的</span>
+        </div>
+    </div>
+
+</body>
+
+</html>
