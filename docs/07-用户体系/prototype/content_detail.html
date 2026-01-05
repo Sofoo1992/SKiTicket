@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>动态详情</title>
+    <style>
+        :root {
+            --primary-color: #1890ff;
+            --text-main: #333;
+            --text-sub: #999;
+            --bg-page: #f5f6f8;
+            --white: #fff;
+            --border: #eee;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--bg-page);
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+            color: var(--text-main);
+            min-height: 100vh;
+            padding-bottom: 140px;
+        }
+
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--white);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .back-btn {
+            font-size: 24px;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .author-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .author-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid #eee;
+        }
+
+        .author-name {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .author-date {
+            font-size: 11px;
+            color: #999;
+        }
+
+        .more-btn {
+            font-size: 20px;
+            color: #999;
+        }
+
+        /* Content Area */
+        .content-area {
+            background: var(--white);
+            margin-bottom: 12px;
+        }
+
+        .content-list {
+            padding: 0 16px;
+        }
+
+        .rank-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .rank-num {
+            width: 28px;
+            font-size: 14px;
+            color: #999;
+            font-weight: 600;
+        }
+
+        .rank-num.gold {
+            color: #faad14;
+        }
+
+        .rank-num.silver {
+            color: #999;
+        }
+
+        .rank-num.bronze {
+            color: #d48806;
+        }
+
+        .rank-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 12px;
+        }
+
+        .rank-info {
+            flex: 1;
+        }
+
+        .rank-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .rank-stats {
+            font-size: 11px;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        .rank-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1890ff;
+        }
+
+        .rank-unit {
+            font-size: 11px;
+            color: #999;
+        }
+
+        /* Post Title */
+        .post-title {
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 500;
+            background: var(--white);
+            border-top: 1px solid #f5f5f5;
+        }
+
+        /* Comments Section */
+        .comments-section {
+            background: var(--white);
+            margin-top: 12px;
+        }
+
+        .comments-header {
+            padding: 14px 16px;
+            font-size: 14px;
+            color: #666;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .comment-item {
+            padding: 14px 16px;
+            display: flex;
+            gap: 12px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .comment-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .comment-content {
+            flex: 1;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .comment-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .comment-like {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: #999;
+            cursor: pointer;
+        }
+
+        .comment-like.liked {
+            color: #ff4d4f;
+        }
+
+        .comment-text {
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 6px;
+        }
+
+        .comment-sticker {
+            max-width: 120px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+        }
+
+        .comment-meta {
+            font-size: 11px;
+            color: #999;
+            display: flex;
+            gap: 16px;
+        }
+
+        .comment-reply-btn {
+            color: #1890ff;
+            cursor: pointer;
+        }
+
+        /* Reply Thread */
+        .reply-thread {
+            margin-top: 10px;
+            padding: 10px 12px;
+            background: #f7f8fa;
+            border-radius: 8px;
+        }
+
+        .reply-item {
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .reply-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .reply-text {
+            flex: 1;
+        }
+
+        .reply-delete {
+            color: #999;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 2px 6px;
+            margin-left: 8px;
+            flex-shrink: 0;
+        }
+
+        .reply-delete:hover {
+            color: #ff4d4f;
+        }
+
+        .reply-action {
+            color: #1890ff;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 2px 6px;
+            margin-left: 8px;
+            flex-shrink: 0;
+        }
+
+        .reply-action:hover {
+            text-decoration: underline;
+        }
+
+        .reply-author {
+            color: #1890ff;
+        }
+
+        .divider {
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #ccc;
+        }
+
+        /* Bottom Bar */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border-top: 1px solid #eee;
+            z-index: 100;
+        }
+
+        .bottom-main {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+        }
+
+        .input-box {
+            flex: 1;
+            height: 36px;
+            background: #f5f7fa;
+            border-radius: 18px;
+            padding: 0 16px;
+            font-size: 14px;
+            color: #333;
+            border: none;
+            outline: none;
+        }
+
+        .input-box::placeholder {
+            color: #999;
+        }
+
+        .action-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            font-size: 10px;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .action-icon {
+            font-size: 20px;
+        }
+
+        .action-item.liked .action-icon {
+            color: #ff4d4f;
+        }
+
+        /* Emoji Panel */
+        .emoji-panel {
+            display: none;
+            background: var(--white);
+            border-top: 1px solid #eee;
+            max-height: 280px;
+            overflow-y: auto;
+        }
+
+        .emoji-panel.show {
+            display: block;
+        }
+
+        .emoji-tabs {
+            display: none;
+        }
+
+        .emoji-tab {
+            padding: 10px 16px;
+            font-size: 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+
+        .emoji-tab.active {
+            border-bottom-color: #1890ff;
+        }
+
+        .emoji-content {
+            padding: 12px;
+        }
+
+        .emoji-section-title {
+            font-size: 13px;
+            color: #999;
+            margin-bottom: 12px;
+        }
+
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .emoji-item {
+            font-size: 24px;
+            text-align: center;
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .emoji-item:active {
+            background: #f5f5f5;
+        }
+
+        .sticker-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .sticker-item {
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .sticker-item img {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            background: #f5f7fa;
+        }
+
+        .sticker-item span {
+            display: block;
+            font-size: 11px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        /* Reply Modal */
+        .modal-mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+        }
+
+        .modal-mask.show {
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .reply-modal {
+            width: 100%;
+            background: var(--white);
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .reply-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .reply-to {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .reply-close {
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+        }
+
+        .reply-input-area {
+            padding: 12px 16px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .reply-input {
+            width: 100%;
+            min-height: 80px;
+            max-height: 150px;
+            padding: 12px;
+            background: #f5f7fa;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            color: #333;
+            resize: none;
+            outline: none;
+        }
+
+        .reply-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+        }
+
+        .toolbar-left {
+            display: flex;
+            gap: 16px;
+        }
+
+        .toolbar-btn {
+            font-size: 22px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+        }
+
+        .toolbar-btn.active {
+            background: #e6f4ff;
+        }
+
+        .send-btn {
+            padding: 8px 20px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .send-btn:disabled {
+            background: #ccc;
+        }
+
+        .modal-emoji-panel {
+            flex: 1;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .modal-emoji-panel.show {
+            display: block;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 2000;
+            display: none;
+        }
+
+        .toast.show {
+            display: block;
+            animation: fadeInOut 1.5s ease;
+        }
+
+        @keyframes fadeInOut {
+
+            0%,
+            100% {
+                opacity: 0;
+            }
+
+            20%,
+            80% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <a href="my_interaction.html" class="back-btn">‹</a>
+        <div class="author-info">
+            <img src="https://picsum.photos/100/100?random=1" class="author-avatar">
+            <div>
+                <div class="author-name">木对</div>
+                <div class="author-date">2025.12.31 · 北京</div>
+            </div>
+        </div>
+        <span class="more-btn">···</span>
+    </div>
+
+    <!-- Content -->
+    <div class="content-area">
+        <div class="content-list">
+            <div class="rank-item">
+                <span class="rank-num gold">🥇</span>
+                <img src="https://picsum.photos/100/100?random=70" class="rank-avatar">
+                <div class="rank-info">
+                    <div class="rank-name">用户1354216</div>
+                    <div class="rank-stats">最高速度 49.4</div>
+                </div>
+                <div>
+                    <span class="rank-value">10.30</span>
+                    <span class="rank-unit">公里</span>
+                </div>
+            </div>
+            <div class="rank-item">
+                <span class="rank-num silver">🥈</span>
+                <img src="https://picsum.photos/100/100?random=71" class="rank-avatar">
+                <div class="rank-info">
+                    <div class="rank-name">用户1353027</div>
+                    <div class="rank-stats">最高速度 48.8</div>
+                </div>
+                <div>
+                    <span class="rank-value">8.75</span>
+                    <span class="rank-unit">公里</span>
+                </div>
+            </div>
+            <div class="rank-item">
+                <span class="rank-num bronze">🥉</span>
+                <img src="https://picsum.photos/100/100?random=72" class="rank-avatar">
+                <div class="rank-info">
+                    <div class="rank-name">yoyo Miao</div>
+                    <div class="rank-stats">最高速度 38.0</div>
+                </div>
+                <div>
+                    <span class="rank-value">7.98</span>
+                    <span class="rank-unit">公里</span>
+                </div>
+            </div>
+            <div class="rank-item">
+                <span class="rank-num">4</span>
+                <img src="https://picsum.photos/100/100?random=73" class="rank-avatar">
+                <div class="rank-info">
+                    <div class="rank-name">雪赋CEO-长顺</div>
+                    <div class="rank-stats">最高速度 50.0 单板</div>
+                </div>
+                <div>
+                    <span class="rank-value">7.30</span>
+                    <span class="rank-unit">公里</span>
+                </div>
+            </div>
+            <div class="rank-item">
+                <span class="rank-num">5</span>
+                <img src="https://picsum.photos/100/100?random=74" class="rank-avatar">
+                <div class="rank-info">
+                    <div class="rank-name">推坡时长两年半</div>
+                    <div class="rank-stats">最高速度 24.9 单板</div>
+                </div>
+                <div>
+                    <span class="rank-value">7.22</span>
+                    <span class="rank-unit">公里</span>
+                </div>
+            </div>
+        </div>
+        <div class="post-title">mark</div>
+    </div>
+
+    <!-- Comments Section -->
+    <div class="comments-section">
+        <div class="comments-header">共 <span id="commentCount">1</span> 条评论</div>
+
+        <div class="comment-item" id="comment1">
+            <img src="https://picsum.photos/100/100?random=50" class="comment-avatar">
+            <div class="comment-content">
+                <div class="comment-header">
+                    <span class="comment-name">雪</span>
+                    <span class="comment-like" onclick="toggleCommentLike(this)">♡ 0</span>
+                </div>
+                <div class="comment-text">p的，大家不要信🙈</div>
+                <div class="comment-meta">
+                    <span>2025.12.31 · 北京</span>
+                    <span class="comment-reply-btn" onclick="openReply('雪', 1)">回复</span>
+                </div>
+                <div class="reply-thread" id="replyThread1">
+                    <div class="reply-item" id="otherReply1">
+                        <span class="reply-text"><span class="reply-author">小明</span> 回复 <span
+                                class="reply-author">雪</span>：真的假的？🤔</span>
+                        <span class="reply-action" onclick="openReplyToReply('小明', 1)">回复</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="divider">我是有底线的</div>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="bottom-bar">
+        <div class="bottom-main">
+            <input type="text" class="input-box" placeholder="静待暖人言~" id="mainInput" onclick="openMainReply()">
+            <div class="action-item">
+                <span class="action-icon">💬</span>
+                <span id="commentNum">1</span>
+            </div>
+            <div class="action-item" id="likeBtn" onclick="toggleMainLike(this)">
+                <span class="action-icon">♡</span>
+                <span id="likeNum">4</span>
+            </div>
+            <div class="action-item">
+                <span class="action-icon">↗</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reply Modal -->
+    <div id="replyModal" class="modal-mask" onclick="closeReply(event)">
+        <div class="reply-modal" onclick="event.stopPropagation()">
+            <div class="reply-header">
+                <span class="reply-to" id="replyTo">发表评论</span>
+                <span class="reply-close" onclick="closeReply()">×</span>
+            </div>
+            <div class="reply-input-area">
+                <textarea class="reply-input" id="replyInput" placeholder="说点什么吧..." oninput="checkInput()"></textarea>
+            </div>
+            <div class="reply-toolbar">
+                <div class="toolbar-left">
+                    <span class="toolbar-btn" id="emojiTabBtn" onclick="switchEmojiTab('system')">😊</span>
+                    <span class="toolbar-btn" id="stickerTabBtn" onclick="switchEmojiTab('xueda')">
+                        <img src="https://picsum.photos/22/22?random=99"
+                            style="border-radius: 4px; vertical-align: middle;">
+                    </span>
+                </div>
+                <button class="send-btn" id="sendBtn" disabled onclick="sendReply()">发送</button>
+            </div>
+            <!-- Modal Emoji Panel -->
+            <div class="modal-emoji-panel" id="modalEmojiPanel">
+                <div class="emoji-tabs"></div>
+                <div class="emoji-content" id="emojiSystemPanel">
+                    <div class="emoji-grid">
+                        <span class="emoji-item" onclick="insertEmoji('👍')">👍</span>
+                        <span class="emoji-item" onclick="insertEmoji('🤝')">🤝</span>
+                        <span class="emoji-item" onclick="insertEmoji('🙅')">🙅</span>
+                        <span class="emoji-item" onclick="insertEmoji('😠')">😠</span>
+                        <span class="emoji-item" onclick="insertEmoji('😘')">😘</span>
+                        <span class="emoji-item" onclick="insertEmoji('🥳')">🥳</span>
+                        <span class="emoji-item" onclick="insertEmoji('😎')">😎</span>
+                        <span class="emoji-item" onclick="insertEmoji('😹')">😹</span>
+                        <span class="emoji-item" onclick="insertEmoji('❤️')">❤️</span>
+                        <span class="emoji-item" onclick="insertEmoji('🔥')">🔥</span>
+                        <span class="emoji-item" onclick="insertEmoji('👏')">👏</span>
+                        <span class="emoji-item" onclick="insertEmoji('😍')">😍</span>
+                        <span class="emoji-item" onclick="insertEmoji('🤣')">🤣</span>
+                        <span class="emoji-item" onclick="insertEmoji('😭')">😭</span>
+                        <span class="emoji-item" onclick="insertEmoji('🙈')">🙈</span>
+                        <span class="emoji-item" onclick="insertEmoji('💪')">💪</span>
+                    </div>
+                </div>
+                <div class="emoji-content" id="emojiXuedaPanel" style="display: none;">
+                    <div class="emoji-section-title">雪哒官方表情包</div>
+                    <div class="sticker-grid">
+                        <div class="sticker-item" onclick="insertSticker('明早顶门', 'sticker1')">
+                            <img src="https://picsum.photos/80/80?random=101">
+                            <span>明早顶门</span>
+                        </div>
+                        <div class="sticker-item" onclick="insertSticker('求搭子', 'sticker2')">
+                            <img src="https://picsum.photos/80/80?random=102">
+                            <span>求搭子</span>
+                        </div>
+                        <div class="sticker-item" onclick="insertSticker('失误...但快乐', 'sticker3')">
+                            <img src="https://picsum.photos/80/80?random=103">
+                            <span>失误...</span>
+                        </div>
+                        <div class="sticker-item" onclick="insertSticker('山顶见', 'sticker4')">
+                            <img src="https://picsum.photos/80/80?random=104">
+                            <span>山顶见</span>
+                        </div>
+                        <div class="sticker-item" onclick="insertSticker('滑得不错', 'sticker5')">
+                            <img src="https://picsum.photos/80/80?random=105">
+                            <span>滑得不错</span>
+                        </div>
+                        <div class="sticker-item" onclick="insertSticker('这坡不陡', 'sticker6')">
+                            <img src="https://picsum.photos/80/80?random=106">
+                            <span>这坡不陡</span>
+                        </div>
+                        <div class="sticker-item" onclick="insertSticker('冲呀', 'sticker7')">
+                            <img src="https://picsum.photos/80/80?random=107">
+                            <span>冲呀</span>
+                        </div>
+                        <div class="sticker-item" onclick="insertSticker('危!刹车', 'sticker8')">
+                            <img src="https://picsum.photos/80/80?random=108">
+                            <span>危!刹车</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        let currentReplyTo = '';
+        let currentCommentId = null;
+        let isMainReply = false;
+        let pendingSticker = null;
+
+        function openReply(userName, commentId) {
+            currentReplyTo = userName;
+            currentCommentId = commentId;
+            isMainReply = false;
+            document.getElementById('replyTo').textContent = '回复 ' + userName;
+            document.getElementById('replyInput').value = '';
+            document.getElementById('replyInput').placeholder = '回复 ' + userName + '...';
+            document.getElementById('sendBtn').disabled = true;
+            document.getElementById('modalEmojiPanel').classList.remove('show');
+            document.getElementById('replyModal').classList.add('show');
+            pendingSticker = null;
+        }
+
+        // Reply to someone else's reply in thread
+        function openReplyToReply(userName, commentId) {
+            currentReplyTo = userName;
+            currentCommentId = commentId;
+            isMainReply = false;
+            document.getElementById('replyTo').textContent = '回复 ' + userName;
+            document.getElementById('replyInput').value = '';
+            document.getElementById('replyInput').placeholder = '回复 ' + userName + '...';
+            document.getElementById('sendBtn').disabled = true;
+            document.getElementById('modalEmojiPanel').classList.remove('show');
+            document.getElementById('replyModal').classList.add('show');
+            pendingSticker = null;
+        }
+
+        function openMainReply() {
+            isMainReply = true;
+            currentCommentId = null;
+            document.getElementById('replyTo').textContent = '发表评论';
+            document.getElementById('replyInput').value = '';
+            document.getElementById('replyInput').placeholder = '说点什么吧...';
+            document.getElementById('sendBtn').disabled = true;
+            document.getElementById('modalEmojiPanel').classList.remove('show');
+            document.getElementById('replyModal').classList.add('show');
+            pendingSticker = null;
+        }
+
+        function closeReply(event) {
+            if (!event || event.target.classList.contains('modal-mask')) {
+                document.getElementById('replyModal').classList.remove('show');
+                document.getElementById('modalEmojiPanel').classList.remove('show');
+                pendingSticker = null;
+            }
+        }
+
+        function checkInput() {
+            const input = document.getElementById('replyInput').value.trim();
+            document.getElementById('sendBtn').disabled = input.length === 0 && !pendingSticker;
+        }
+
+        function toggleModalEmoji() {
+            document.getElementById('modalEmojiPanel').classList.toggle('show');
+        }
+
+        function switchEmojiTab(type) {
+            // Toggle panel visibility
+            const panel = document.getElementById('modalEmojiPanel');
+            const emojiBtn = document.getElementById('emojiTabBtn');
+            const stickerBtn = document.getElementById('stickerTabBtn');
+
+            // Remove active from all
+            emojiBtn.classList.remove('active');
+            stickerBtn.classList.remove('active');
+
+            if (type === 'system') {
+                emojiBtn.classList.add('active');
+                document.getElementById('emojiSystemPanel').style.display = 'block';
+                document.getElementById('emojiXuedaPanel').style.display = 'none';
+            } else {
+                stickerBtn.classList.add('active');
+                document.getElementById('emojiSystemPanel').style.display = 'none';
+                document.getElementById('emojiXuedaPanel').style.display = 'block';
+            }
+            panel.classList.add('show');
+        }
+
+        function insertEmoji(emoji) {
+            const input = document.getElementById('replyInput');
+            const start = input.selectionStart;
+            const end = input.selectionEnd;
+            const text = input.value;
+            input.value = text.substring(0, start) + emoji + text.substring(end);
+            input.selectionStart = input.selectionEnd = start + emoji.length;
+            input.focus();
+            checkInput();
+        }
+
+        function insertSticker(name, id) {
+            pendingSticker = { name, id };
+            const input = document.getElementById('replyInput');
+            // Append sticker marker instead of replacing
+            if (input.value.trim()) {
+                input.value = input.value + ' [' + name + ']';
+            } else {
+                input.value = '[' + name + ']';
+            }
+            document.getElementById('sendBtn').disabled = false;
+            showToast('已选择表情包');
+        }
+
+        function sendReply() {
+            const input = document.getElementById('replyInput').value.trim();
+            if (input || pendingSticker) {
+                if (isMainReply) {
+                    // Add new comment
+                    addNewComment(input, pendingSticker);
+                } else if (currentCommentId) {
+                    // Add reply to existing comment
+                    addReplyToComment(currentCommentId, input, pendingSticker);
+                }
+                closeReply();
+                showToast(isMainReply ? '评论已发送！' : '回复已发送！');
+                pendingSticker = null;
+            }
+        }
+
+        function addNewComment(text, sticker) {
+            const section = document.querySelector('.comments-section');
+            const divider = section.querySelector('.divider');
+            const newId = Date.now();
+
+            let contentHtml = '';
+            if (sticker) {
+                contentHtml = `<img src="https://picsum.photos/120/120?random=${newId}" class="comment-sticker">`;
+            } else {
+                contentHtml = `<div class="comment-text">${text}</div>`;
+            }
+
+            const newComment = document.createElement('div');
+            newComment.className = 'comment-item';
+            newComment.innerHTML = `
+                <img src="https://picsum.photos/100/100?random=1" class="comment-avatar">
+                <div class="comment-content">
+                    <div class="comment-header">
+                        <span class="comment-name">木对</span>
+                        <span class="comment-like" onclick="toggleCommentLike(this)">♡ 0</span>
+                    </div>
+                    ${contentHtml}
+                    <div class="comment-meta">
+                        <span>刚刚 · 北京</span>
+                        <span class="comment-reply-btn" onclick="openReply('木对', ${newId})">回复</span>
+                    </div>
+                    <div class="reply-thread" id="replyThread${newId}" style="display: none;"></div>
+                </div>
+            `;
+            section.insertBefore(newComment, divider);
+
+            // Update count
+            const count = document.getElementById('commentCount');
+            count.textContent = parseInt(count.textContent) + 1;
+            const num = document.getElementById('commentNum');
+            num.textContent = parseInt(num.textContent) + 1;
+        }
+
+        function addReplyToComment(commentId, text, sticker) {
+            const thread = document.getElementById('replyThread' + commentId);
+            thread.style.display = 'block';
+
+            let contentHtml = '';
+            // Show text content (may include emoji)
+            // Remove sticker marker from text for display
+            let displayText = text.replace(/\s*\[[^\]]+\]/g, '').trim();
+            if (displayText) {
+                contentHtml = displayText;
+            }
+            // Add sticker image if selected
+            if (sticker) {
+                if (contentHtml) contentHtml += '<br>';
+                contentHtml += `<img src="https://picsum.photos/80/80?random=${Date.now()}" style="border-radius: 6px; display: block; margin-top: 4px;">`;
+            }
+
+            const replyId = 'reply_' + Date.now();
+            const newReply = document.createElement('div');
+            newReply.className = 'reply-item';
+            newReply.id = replyId;
+            newReply.innerHTML = `<span class="reply-text"><span class="reply-author">木对</span> 回复 <span class="reply-author">${currentReplyTo}</span>：${contentHtml}</span><span class="reply-delete" onclick="deleteReply('${replyId}', ${commentId})">删除</span>`;
+            thread.appendChild(newReply);
+        }
+
+        function deleteReply(replyId, commentId) {
+            const reply = document.getElementById(replyId);
+            if (reply) {
+                reply.remove();
+                showToast('已删除');
+                // Check if thread is empty
+                const thread = document.getElementById('replyThread' + commentId);
+                if (thread && thread.children.length === 0) {
+                    thread.style.display = 'none';
+                }
+            }
+        }
+
+        function toggleCommentLike(el) {
+            if (el.classList.contains('liked')) {
+                el.classList.remove('liked');
+                const num = parseInt(el.textContent.replace('♥ ', '')) - 1;
+                el.innerHTML = '♡ ' + num;
+            } else {
+                el.classList.add('liked');
+                const num = parseInt(el.textContent.replace('♡ ', '')) + 1;
+                el.innerHTML = '♥ ' + num;
+                showToast('点赞成功！');
+            }
+        }
+
+        function toggleMainLike() {
+            const likeBtn = document.getElementById('likeBtn');
+            const likeNum = document.getElementById('likeNum');
+            if (likeBtn.classList.contains('liked')) {
+                likeBtn.classList.remove('liked');
+                likeBtn.querySelector('.action-icon').textContent = '♡';
+                likeNum.textContent = parseInt(likeNum.textContent) - 1;
+            } else {
+                likeBtn.classList.add('liked');
+                likeBtn.querySelector('.action-icon').textContent = '♥';
+                likeNum.textContent = parseInt(likeNum.textContent) + 1;
+                showToast('点赞成功！');
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 1500);
+        }
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>我的</title>
+    <style>
+        :root {
+            --primary-color: #1890ff;
+            --text-main: #333;
+            --text-sub: #999;
+            --bg-page: #f5f6f8;
+            --white: #fff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--bg-page);
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+            color: var(--text-main);
+            padding-bottom: 80px;
+        }
+
+        /* === Header Area === */
+        .profile-header {
+            background: linear-gradient(180deg, #fff 0%, #f5f6f8 100%);
+            padding: 16px;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .top-bar-left {
+            font-size: 20px;
+            color: #999;
+        }
+
+        .top-bar-right {
+            display: flex;
+            gap: 20px;
+            font-size: 20px;
+            color: #333;
+        }
+
+        .avatar-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: #eee;
+            border: 3px solid #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            object-fit: cover;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .username {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .user-tags {
+            display: flex;
+            gap: 6px;
+            margin-top: 6px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .tag {
+            background: #e6f4ff;
+            color: #1890ff;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .ski-log-btn {
+            background: #e6f4ff;
+            color: #1890ff;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        /* === Stats Row === */
+        .stats-row {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px 0;
+            background: var(--white);
+            margin: 12px 0;
+            border-radius: 12px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .stat-unit {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        /* === Quick Entry === */
+        .quick-entry {
+            display: flex;
+            justify-content: space-around;
+            background: var(--white);
+            padding: 16px 0;
+            border-radius: 12px;
+        }
+
+        .entry-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .entry-icon {
+            width: 44px;
+            height: 44px;
+            background: #f5f7fa;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .entry-label {
+            font-size: 12px;
+            color: #333;
+        }
+
+        /* === Section Card === */
+        .section-card {
+            background: var(--white);
+            border-radius: 12px;
+            margin: 12px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 14px 16px;
+            font-size: 15px;
+            font-weight: 600;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        /* === Workspace Grid (工作台) === */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            padding: 16px;
+        }
+
+        .workspace-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 0;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .workspace-item:active {
+            background: #f5f7fa;
+        }
+
+        .workspace-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #e6f4ff 0%, #bae7ff 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            position: relative;
+        }
+
+        .workspace-icon.purple {
+            background: linear-gradient(135deg, #f9f0ff 0%, #efdbff 100%);
+        }
+
+        .workspace-icon.orange {
+            background: linear-gradient(135deg, #fff7e6 0%, #ffe7ba 100%);
+        }
+
+        .workspace-icon.green {
+            background: linear-gradient(135deg, #f6ffed 0%, #d9f7be 100%);
+        }
+
+        .badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #ff4d4f;
+            color: white;
+            font-size: 10px;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+        }
+
+        .workspace-label {
+            font-size: 12px;
+            color: #333;
+        }
+
+        /* === List Item === */
+        .list-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .list-icon {
+            width: 36px;
+            height: 36px;
+            background: #f5f7fa;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-right: 12px;
+        }
+
+        .list-content {
+            flex: 1;
+        }
+
+        .list-title {
+            font-size: 15px;
+        }
+
+        .list-desc {
+            font-size: 12px;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        .list-arrow {
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        /* === Tab Bar === */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: var(--white);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid #eee;
+            padding-bottom: constant(safe-area-inset-bottom);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            color: #999;
+        }
+
+        .tab-item.active {
+            color: #333;
+        }
+
+        .tab-icon {
+            font-size: 22px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="top-bar">
+            <div class="top-bar-left">↻</div>
+            <div class="top-bar-right">
+                <span>👤</span>
+                <span>⚙️</span>
+                <span>🎧</span>
+            </div>
+        </div>
+        <div class="avatar-row">
+            <img src="https://picsum.photos/100/100?random=1" class="avatar">
+            <div class="user-info">
+                <div class="username">木对 ></div>
+                <div class="user-tags">
+                    <span>♂</span>
+                    <span class="tag">🏂 单板</span>
+                </div>
+            </div>
+            <div class="ski-log-btn">滑行日志 ▸</div>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div style="padding: 0 12px;">
+        <div class="stats-row">
+            <div class="stat-item">
+                <div class="stat-value">18.21<span class="stat-unit">公里</span></div>
+                <div class="stat-label">总滑行里程</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">35.3<span class="stat-unit">公里/时</span></div>
+                <div class="stat-label">最高速度</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">1.4<span class="stat-unit">时</span></div>
+                <div class="stat-label">总滑行时长</div>
+            </div>
+        </div>
+
+        <!-- Quick Entry -->
+        <div class="quick-entry">
+            <div class="entry-item">
+                <div class="entry-icon">👥</div>
+                <div class="entry-label">找搭子</div>
+            </div>
+            <div class="entry-item">
+                <div class="entry-icon">🏛️</div>
+                <div class="entry-label">俱乐部</div>
+            </div>
+            <div class="entry-item">
+                <div class="entry-icon">💰</div>
+                <div class="entry-label">钱包</div>
+            </div>
+            <div class="entry-item">
+                <div class="entry-icon">📋</div>
+                <div class="entry-label">所有订单</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 雪币积分 (保持原样) -->
+    <div class="section-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 16px;">
+            <div style="font-size: 15px; font-weight: 600;">雪币积分</div>
+            <div style="display: flex; align-items: center; gap: 4px;">
+                <span style="color: #faad14; font-size: 18px; font-weight: 700;">🪙 36.4</span>
+                <span style="font-size: 11px; color: #52c41a;">↑本周新增0</span>
+            </div>
+        </div>
+        <div style="display: flex; justify-content: space-around; padding: 0 16px 16px;">
+            <div class="entry-item">
+                <div class="entry-icon" style="background: #fff7e6;">🎁</div>
+                <div class="entry-label">去赚币</div>
+            </div>
+            <div class="entry-item">
+                <div class="entry-icon" style="background: #fff7e6;">🛍️</div>
+                <div class="entry-label">去花币</div>
+            </div>
+            <div class="entry-item">
+                <div class="entry-icon" style="background: #f5f7fa;">📜</div>
+                <div class="entry-label">查订单</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 申请认证 (保持原样) -->
+    <div class="section-card">
+        <div class="list-item">
+            <div class="list-icon">🎓</div>
+            <div class="list-content">
+                <div class="list-title">申请认证</div>
+                <div class="list-desc">快去通过认证成为教练或者摄影师吧！</div>
+            </div>
+            <div class="list-arrow">▸</div>
+        </div>
+    </div>
+
+    <!-- ★★★ 我的内容区域 ★★★ -->
+    <div class="section-card">
+        <div class="section-header">我的内容</div>
+        <div class="workspace-grid">
+            <!-- 内容互动 -->
+            <a href="my_interaction.html" class="workspace-item">
+                <div class="workspace-icon purple">
+                    💬
+                    <span class="badge">12</span>
+                </div>
+                <div class="workspace-label">内容互动</div>
+            </a>
+            <!-- 我的发布 -->
+            <a href="my_publish_manage.html" class="workspace-item">
+                <div class="workspace-icon">📝</div>
+                <div class="workspace-label">我的发布</div>
+            </a>
+            <!-- 我的二手 (整合到内容管理) -->
+            <a href="my_publish_manage.html#idle" class="workspace-item">
+                <div class="workspace-icon orange">🛒</div>
+                <div class="workspace-label">我的二手</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Tab Bar -->
+    <div class="tab-bar">
+        <div class="tab-item">
+            <span class="tab-icon">🏠</span>
+            <span>首页</span>
+        </div>
+        <div class="tab-item">
+            <span class="tab-icon">🛒</span>
+            <span>交易</span>
+        </div>
+        <div class="tab-item">
+            <span class="tab-icon">📍</span>
+            <span>轨迹</span>
+        </div>
+        <div class="tab-item">
+            <span class="tab-icon">💬</span>
+            <span>消息</span>
+        </div>
+        <div class="tab-item active">
+            <span class="tab-icon">🥽</span>
+            <span>我的</span>
+        </div>
+    </div>
+
+</body>
+
+</html>
